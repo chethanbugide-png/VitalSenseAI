@@ -1,2 +1,143 @@
-# VitalSenseAI
-AI-powered healthcare platform that analyzes patient vitals and symptoms to classify medical risk levels and recommend appropriate medical actions and doctor specializations.
+<div align="center">
+  
+# 🏥 VitalSense AI
+
+**A Next-Generation AI-Driven Patient Monitoring & Risk Triage System**
+
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+[![Flask](https://img.shields.io/badge/flask-%23000.svg?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![Scikit-Learn](https://img.shields.io/badge/scikit--learn-%23F7931E.svg?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+[Features](#features) • [Installation](#installation) • [Usage](#usage) • [Tech Stack](#tech-stack) • [Architecture](#architecture)
+</div>
+
+---
+
+## 📖 Overview
+
+**VitalSense AI** is an advanced, machine-learning-powered healthcare dashboard designed to streamline patient triage, monitor real-time vital signs, and provide early warning assessments for medical professionals. 
+
+By leveraging predictive analytics, the system dynamically classifies patient risk levels (Low, Moderate, High) based on physiological parameters, enabling doctors and nurses to make faster, data-driven critical decisions.
+
+---
+
+## ✨ Key Features
+
+- **🤖 AI Risk Prediction**: Utilizes Scikit-Learn machine learning models to predict patient risk status based on real-time vitals (Heart rate, SpO2, Blood Pressure, Temperature).
+- **👥 Role-Based Dashboards**: 
+  - **Nursing Interface**: Add new patient records, update real-time vitals, and view historical data.
+  - **Doctor Interface**: Review AI-generated risk scores, write prescriptions, and provide specialized clinical instructions.
+- **📊 Real-Time Analytics**: Visual gauges and comprehensive dashboard charts displaying triage statistics.
+- **📈 Patient History Tracking**: Chronological charting of a patient's vital signs and AI risk assessments over time.
+- **🔒 Secure Authentication**: Robust login system with password hashing ensuring protected access to medical records.
+
+---
+
+## 🛠 Tech Stack
+
+| Component | Technology | Description |
+| :--- | :--- | :--- |
+| **Backend** | Python, Flask | Lightweight and performant web server |
+| **Machine Learning** | Scikit-Learn | Random Forest Classifier for predictive risk modeling |
+| **Database** | SQLite | Relational database for patient records and auth |
+| **Frontend** | HTML5, CSS3, JavaScript | Responsive, dashboard-driven user interface |
+| **Data Processing** | Pandas, NumPy | Efficient data manipulation and model scaling |
+
+---
+
+## 📂 Project Architecture
+
+```text
+VitalSenseAI/
+├── app.py                   # Main Flask application and server
+├── database.py              # SQLite database management layer
+├── ml/                      
+│   ├── train_model.py       # Scikit-learn model training pipeline
+│   └── generate_dataset.py  # Synthetic patient data generation
+├── models/                  # Serialized ML models (Joblib/Pickle)
+├── static/                  
+│   ├── style.css            # Custom dashboard styling
+│   └── script.js            # Frontend interactions and charting
+├── templates/               # Flask HTML Templates
+│   ├── index.html           # Landing page
+│   ├── login.html           # Authentication portal
+│   ├── dashboard.html       # Main medical control panel
+│   ├── assessment.html      # AI Assessment input form
+│   └── history.html         # Patient data timeline
+└── vitalsense.db            # Local SQLite Database
+```
+
+---
+
+## 🚀 Installation & Setup
+
+Follow these instructions to run VitalSense AI on your local machine.
+
+### Prerequisites
+- [Python 3.8+](https://www.python.org/downloads/)
+- [Git](https://git-scm.com/)
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/chethanbugide-png/VitalSenseAI.git
+cd VitalSenseAI
+```
+
+### 2. Create a Virtual Environment (Recommended)
+```bash
+python -m venv venv
+# On Windows
+venv\Scripts\activate
+# On macOS/Linux
+source venv/bin/activate
+```
+
+### 3. Install Dependencies
+```bash
+pip install flask pandas numpy scikit-learn joblib
+```
+
+### 4. Database Setup & Model Training
+The database gets created automatically on the first run. To generate the preliminary machine learning model:
+
+```bash
+python ml/train_model.py
+```
+
+### 5. Run the Application
+```bash
+python app.py
+```
+*The server will start on `http://localhost:5000`*
+
+---
+
+## 🔐 Default Credentials
+*(For demonstration purposes)*
+- **Doctor Account**: Username: `doctor1`, Password: `password`
+- **Nurse Account**: Username: `nurse1`, Password: `password`
+
+---
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome! 
+Feel free to check out the [issues page](https://github.com/chethanbugide-png/VitalSenseAI/issues).
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📝 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+<div align="center">
+  <i>Built with ❤️ for better patient care.</i>
+</div>
