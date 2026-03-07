@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environments
+venv/
+env/
+.env
+.venv/
+
+# Databases
+*.db
+*.sqlite3
+vitalsense.db
+
+# OS generated files
+.DS_Store
+Thumbs.db
