@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% block title %}Neural Timeline - VitalSense AI{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 relative z-10">
+    
+    <!-- Header -->
+    <div class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 relative z-10">
+        <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold tracking-widest uppercase mb-3 border border-slate-200 shadow-inner">
+                <i class="fa-solid fa-clock-rotate-left text-medical-500"></i> Longitudinal Data
+            </div>
+            <h2 class="text-4xl font-black font-display text-slate-900 tracking-tight flex items-center gap-4">
+                {{ name }}
+            </h2>
+            <p class="mt-2 text-lg text-slate-500 font-medium">Patient ID: <span class="font-mono text-medical-700 bg-medical-50 px-2 py-0.5 rounded">{{ patient_id }}</span></p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{{ url_for('dashboard', patient_id=patient_id) }}" class="group relative px-6 py-3 bg-gradient-to-r from-medical-600 to-medical-800 text-white rounded-xl shadow-lg hover:shadow-xl hover:shadow-medical-500/30 transition-all flex items-center gap-2 text-sm font-bold font-display">
+                <i class="fa-solid fa-bolt text-medical-200"></i> 
+                Latest Inference
+            </a>
+            <a href="{{ url_for('history') }}" class="group relative px-5 py-3 bg-white border border-slate-200 rounded-xl shadow-sm hover:bg-slate-50 transition-all flex items-center gap-2 text-sm font-bold text-slate-700">
+                <i class="fa-solid fa-arrow-left text-slate-400 group-hover:-translate-x-1 transition-transform"></i> 
+                Back to Database
+            </a>
+        </div>
+    </div>
+
+    <!-- Analytics Chart -->
+    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl shadow-slate-200/50 border border-white p-8 mb-8">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+            <h3 class="text-xl font-bold font-display text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-chart-area text-medical-500"></i> Trajectory Analysis
+            </h3>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-md">Last 5 Recordings</span>
+        </div>
+        
+        <div class="h-80 w-full relative">
+            <canvas id="vitalsChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Timeline Entries -->
+    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl shadow-slate-200/50 border border-white p-8">
+        <h3 class="text-xl font-bold font-display text-slate-800 flex items-center gap-2 mb-8">
+            <i class="fa-solid fa-list-timeline text-medical-500"></i> Assessment Registry
+        </h3>
+
+        <div class="space-y-6">
+            {% for a in assessments %}
+            <div class="group flex flex-col md:flex-row gap-6 bg-slate-50/50 hover:bg-white p-6 rounded-2xl border border-slate-100 hover:border-medical-200 hover:shadow-lg transition-all relative overflow-hidden">
+                
+                <!-- Status Bar -->
+                {% if a.ai_risk_level == 0 %}
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-emerald-500"></div>
+                {% elif a.ai_risk_level == 1 %}
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-amber-500"></div>
+                {% else %}
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-red-500 group-hover:animate-pulse"></div>
+                {% endif %}
+
+                <!-- Date & Risk -->
+                <div class="md:w-1/4 flex flex-col justify-center border-b md:border-b-0 md:border-r border-slate-200 pb-4 md:pb-0 md:pr-6">
+                    <p class="text-sm font-bold text-slate-500 mb-1 flex items-center gap-2">
+                        <i class="fa-regular fa-calendar text-medical-400"></i> {{ a.created_at.split(' ')[0] }}
+                    </p>
+                    <p class="text-sm font-bold text-slate-400 mb-4 ml-6">
+                        {{ a.created_at.split(' ')[1].split('.')[0] }}
+                    </p>
+
+                    {% if a.ai_risk_level == 0 %}
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100 w-max">
+                            <i class="fa-solid fa-shield-check"></i> Stable
+                        </div>
+                    {% elif a.ai_risk_level == 1 %}
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-50 text-amber-700 text-xs font-bold border border-amber-100 w-max">
+                            <i class="fa-solid fa-eye"></i> Monitor
+                        </div>
+                    {% elif a.ai_risk_level == 2 %}
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 text-red-700 text-xs font-bold border border-red-100 w-max">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Critical
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Vitals Grid -->
+                <div class="md:w-2/4 grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Heart Rate</p>
+                        <p class="text-xl font-black font-display text-slate-800">{{ a.heart_rate }} <span class="text-xs font-medium text-slate-500">bpm</span></p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Blood Pressure</p>
+                        <p class="text-xl font-black font-display text-slate-800">{{ a.sys_bp }}/{{ a.dia_bp }} <span class="text-xs font-medium text-slate-500">mmHg</span></p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Oxygen (SpO2)</p>
+                        <p class="text-xl font-black font-display text-slate-800">{{ a.spo2 }}<span class="text-xs font-medium text-slate-500">%</span></p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Temperature</p>
+                        <p class="text-xl font-black font-display text-slate-800">{{ a.temperature }}<span class="text-xs font-medium text-slate-500">°C</span></p>
+                    </div>
+                </div>
+
+                <!-- Symptoms -->
+                <div class="md:w-1/4 pt-2">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Symptoms Logged</p>
+                    <div class="flex flex-wrap gap-1.5">
+                        {% set symp_list = [] %}
+                        {% if a.chest_pain %} {% set _ = symp_list.append('Chest Pain') %} {% endif %}
+                        {% if a.shortness_breath %} {% set _ = symp_list.append('Shortness') %} {% endif %}
+                        {% if a.fever %} {% set _ = symp_list.append('Fever') %} {% endif %}
+                        {% if a.dizziness %} {% set _ = symp_list.append('Dizziness') %} {% endif %}
+                        {% if a.fatigue %} {% set _ = symp_list.append('Fatigue') %} {% endif %}
+                        {% if a.palpitations %} {% set _ = symp_list.append('Palps') %} {% endif %}
+                        {% if a.nausea %} {% set _ = symp_list.append('Nausea') %} {% endif %}
+                        {% if a.headache %} {% set _ = symp_list.append('Headache') %} {% endif %}
+                        
+                        {% if symp_list|length > 0 %}
+                            {% for symptom in symp_list %}
+                                <span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded shadow-sm border border-slate-200 uppercase">{{ symptom }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-sm font-semibold text-emerald-500"><i class="fa-solid fa-check mr-1"></i> Asymptomatic</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chartData = {{ chart_data | tojson | safe }};
+        
+        const ctx = document.getElementById('vitalsChart').getContext('2d');
+        
+        // Premium chart gradients
+        const gradientHR = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientHR.addColorStop(0, 'rgba(239, 68, 68, 0.2)');
+        gradientHR.addColorStop(1, 'rgba(239, 68, 68, 0)');
+        
+        const gradientSys = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientSys.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
+        gradientSys.addColorStop(1, 'rgba(59, 130, 246, 0)');
+
+        const gradientSpo2 = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientSpo2.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
+        gradientSpo2.addColorStop(1, 'rgba(16, 185, 129, 0)');
+
+        const hrData = chartData.data.map(d => d.hr);
+        const spo2Data = chartData.data.map(d => d.spo2);
+        const sysData = chartData.data.map(d => d.sys);
+        
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#64748b';
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [
+                    {
+                        label: 'Heart Rate (bpm)',
+                        data: hrData,
+                        borderColor: '#ef4444',
+                        backgroundColor: gradientHR,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#ef4444',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        fill: true,
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Systolic BP (mmHg)',
+                        data: sysData,
+                        borderColor: '#3b82f6',
+                        backgroundColor: gradientSys,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#3b82f6',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        fill: true,
+                         tension: 0.4,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'SpO2 (%)',
+                        data: spo2Data,
+                        borderColor: '#10b981',
+                        backgroundColor: gradientSpo2,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#10b981',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        fill: true,
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: { weight: 'bold' }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleFont: { family: "'Outfit', sans-serif", size: 14, weight: 'bold' },
+                        bodyFont: { family: "'Inter', sans-serif", size: 13 },
+                        padding: 12,
+                        cornerRadius: 8,
+                        displayColors: true
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false, drawBorder: false }
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: { display: true, text: 'HR / BP', font: { weight: 'bold' } },
+                        grid: { color: 'rgba(226, 232, 240, 0.5)' },
+                        border: { dash: [4, 4] }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: { display: true, text: 'SpO2 (%)', font: { weight: 'bold' } },
+                        grid: { drawOnChartArea: false },
+                        min: 70,
+                        max: 100
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

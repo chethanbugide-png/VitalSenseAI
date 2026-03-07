@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Directory - VitalSense AI{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 relative z-10">
+    
+    <div class="mb-12 text-center relative animate-fade-in-up delay-100">
+        <h2 class="text-5xl font-black font-display text-slate-900 tracking-tight drop-shadow-sm">Patient Directory</h2>
+        <p class="mt-4 text-xl text-slate-500 font-medium">Global overview of all evaluated records.</p>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="flex justify-center gap-3 mb-8 animate-fade-in-up delay-150" id="patientFilters">
+        <button data-filter="all" class="px-5 py-2.5 rounded-xl text-sm font-bold bg-slate-800 text-white shadow-md shadow-slate-800/20 transition-all border border-slate-700 hover:scale-105">All Patients</button>
+        <button data-filter="critical" class="px-5 py-2.5 rounded-xl text-sm font-bold bg-white text-slate-600 hover:bg-slate-50 shadow-sm transition-all border border-slate-200 hover:text-red-600 hover:border-red-200 hover:scale-105"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Critical</button>
+        <button data-filter="monitor" class="px-5 py-2.5 rounded-xl text-sm font-bold bg-white text-slate-600 hover:bg-slate-50 shadow-sm transition-all border border-slate-200 hover:text-amber-500 hover:border-amber-200 hover:scale-105"><i class="fa-solid fa-eye mr-1"></i> Monitor</button>
+        <button data-filter="stable" class="px-5 py-2.5 rounded-xl text-sm font-bold bg-white text-slate-600 hover:bg-slate-50 shadow-sm transition-all border border-slate-200 hover:text-emerald-500 hover:border-emerald-200 hover:scale-105"><i class="fa-solid fa-shield-check mr-1"></i> Stable</button>
+    </div>
+
+    <!-- Patients Table Card -->
+    <div class="glass-panel bg-medical-50/50 rounded-[2.5rem] p-2 animate-fade-in-up delay-200 transition-all duration-500 hover:shadow-xl hover:shadow-medical-500/10 mb-10 border border-medical-200 shadow-sm">
+        <div class="bg-white/95 backdrop-blur-xl rounded-[2rem] overflow-hidden border border-medical-100 shadow-inner">
+            <div class="bg-gradient-to-r from-medical-500/10 to-transparent px-8 py-6 border-b border-medical-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <h3 class="text-xl font-black font-display text-slate-800 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-medical-500 to-medical-600 text-white flex items-center justify-center shadow-sm shadow-medical-500/20">
+                        <i class="fa-solid fa-users-viewfinder text-sm"></i>
+                    </div>
+                    Database Index
+                </h3>
+                <span class="bg-white text-medical-600 text-xs font-bold px-4 py-1.5 rounded-full border border-medical-100 shadow-sm">{{ patients|length }} Records Found</span>
+            </div>
+        
+        <div class="overflow-x-auto p-6">
+            <table class="w-full border-separate border-spacing-y-4" style="min-width: 800px;">
+                <thead>
+                    <tr>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold font-display text-medical-600 uppercase tracking-widest w-[30%]">Patient Details</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold font-display text-medical-600 uppercase tracking-widest min-w-[150px]">Demographics</th>
+                        <th scope="col" class="px-6 py-4 text-center text-xs font-bold font-display text-medical-600 uppercase tracking-widest min-w-[140px]">Last Triage Status</th>
+                        <th scope="col" class="px-6 py-4 text-center text-xs font-bold font-display text-medical-600 uppercase tracking-widest min-w-[180px]">Date Processed</th>
+                        <th scope="col" class="px-6 py-4 text-right text-xs font-bold font-display text-medical-600 uppercase tracking-widest w-[160px]">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-transparent">
+                    {% for p in patients %}
+                    <!-- Light Theme Row -->
+                    <tr class="group relative bg-white/80 hover:bg-white border border-medical-100 rounded-2xl shadow-sm hover:shadow-md hover:shadow-medical-500/10 transition-all duration-300 transform hover:-translate-y-1 animate-fade-in-up patient-row" data-risk="{{ p.ai_risk_level }}" style="animation-delay: {{ loop.index0 * 100 + 300 }}ms;">
+                        <td class="relative px-6 py-5 whitespace-nowrap rounded-l-2xl border-y border-l border-medical-100 group-hover:border-medical-300 transition-colors">
+                            <!-- Highlight Border on Hover -->
+                            <div class="absolute inset-y-0 left-0 w-1 bg-medical-500 rounded-l-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-medical-50 to-medical-100 text-medical-600 font-black font-display text-lg shadow-sm border border-medical-200 group-hover:rotate-12 transition-transform duration-300">
+                                    {{ p.name[0]|upper }}
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-base font-bold text-slate-800 font-display group-hover:text-medical-600 transition-colors">{{ p.name }}</div>
+                                    <div class="text-xs font-semibold text-slate-500 font-mono mt-0.5">{{ p.patient_id }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-5 whitespace-nowrap border-y border-medical-100 group-hover:border-medical-300 transition-colors">
+                            <div class="flex flex-col gap-1.5 relative z-10 text-left">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-3 py-1 rounded-lg bg-white border border-medical-100 text-slate-600 text-xs font-bold shadow-sm">{{ p.age }}y</span>
+                                    <span class="px-3 py-1 rounded-lg bg-white border border-medical-100 text-slate-600 text-xs font-bold shadow-sm">{{ p.gender[0] }}</span>
+                                </div>
+                                {% if p.room_no or p.bed_no %}
+                                <div class="text-xs font-semibold text-slate-500 flex items-center gap-1">
+                                    <i class="fa-solid fa-location-dot text-medical-400"></i>
+                                    {% if p.room_no %}Rm {{ p.room_no }}{% endif %}
+                                    {% if p.room_no and p.bed_no %}-{% endif %}
+                                    {% if p.bed_no %}Bed {{ p.bed_no }}{% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-6 py-5 whitespace-nowrap text-center border-y border-medical-100 group-hover:border-medical-300 transition-colors relative z-10 w-full h-[90px]">
+                            <div class="flex justify-center items-center h-full w-full">
+                                {% if p.ai_risk_level == 0 %}
+                                    <div class="inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 text-xs font-bold shadow-sm group-hover:bg-emerald-100 transition-all h-[34px] w-[100px]">
+                                        <i class="fa-solid fa-shield-check"></i> Stable
+                                    </div>
+                                {% elif p.ai_risk_level == 1 %}
+                                    <div class="inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 text-xs font-bold shadow-sm group-hover:bg-amber-100 transition-all h-[34px] w-[100px]">
+                                        <i class="fa-solid fa-eye"></i> Monitor
+                                    </div>
+                                {% elif p.ai_risk_level == 2 %}
+                                    <div class="inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-bold shadow-sm group-hover:bg-red-100 transition-all relative overflow-hidden h-[34px] w-[100px]">
+                                        <div class="absolute inset-0 bg-red-100 animate-pulse opacity-50"></div>
+                                        <span class="relative z-10 flex items-center justify-center gap-2">
+                                            <i class="fa-solid fa-triangle-exclamation"></i> Critical
+                                        </span>
+                                    </div>
+                                {% else %}
+                                    <span class="text-xs text-slate-500 italic h-[34px] flex items-center justify-center w-[100px]">No Data</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-6 py-5 whitespace-nowrap text-center text-sm font-medium border-y border-medical-100 group-hover:border-medical-300 transition-colors">
+                            <div class="flex justify-center w-full">
+                                <span class="bg-white px-3 py-1.5 rounded-lg border border-medical-100 text-slate-600 flex items-center justify-center gap-2 shadow-sm w-fit">
+                                    <i class="fa-regular fa-calendar-check text-medical-500"></i>
+                                    {{ p.last_assessment_date.split('.')[0] if p.last_assessment_date else 'N/A' }}
+                                </span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium rounded-r-2xl border-y border-r border-medical-100 group-hover:border-medical-300 transition-colors relative z-10 w-[160px]">
+                            <div class="flex flex-col gap-2">
+                                <a href="{{ url_for('patient_history', patient_id=p.patient_id) }}" class="inline-flex items-center justify-center w-full gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-medical-500 to-medical-600 text-white font-bold transition-all shadow-sm hover:shadow-md hover:shadow-medical-500/20 group/btn">
+                                    <span>Timeline</span> 
+                                    <i class="fa-solid fa-arrow-right-long text-white transition-all group-hover/btn:translate-x-1"></i>
+                                </a>
+                                {% if current_user and current_user.role == 'doctor' %}
+                                <a href="{{ url_for('dashboard', patient_id=p.patient_id) }}#prescription-section" class="inline-flex items-center justify-center w-full gap-2 px-4 py-2 rounded-xl bg-white border border-medical-200 text-medical-600 font-bold transition-all shadow-sm hover:bg-medical-50 hover:border-medical-300 hover:text-medical-700 group/btn2">
+                                    <i class="fa-solid fa-file-prescription text-medical-500 transition-colors group-hover/btn2:text-medical-600"></i>
+                                    <span>Prescribe</span>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr class="animate-pop-in">
+                        <td colspan="5" class="px-8 py-24 text-center">
+                            <div class="inline-flex w-32 h-32 rounded-3xl bg-slate-50 border border-slate-200 items-center justify-center mb-6 shadow-sm mx-auto relative group">
+                                <i class="fa-solid fa-folder-open text-6xl text-slate-400 group-hover:text-medical-500 transition-colors duration-500 group-hover:scale-110"></i>
+                            </div>
+                            <h3 class="text-2xl font-black font-display text-slate-800 mb-3">No Records Residing Here</h3>
+                            <p class="text-lg text-slate-500 max-w-sm mx-auto font-medium">The patient database is pristine. Run an AI assessment to populate intelligent data.</p>
+                            <a href="{{ url_for('assessment') }}" class="mt-8 inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-medical-600 to-medical-500 text-white font-bold hover:from-medical-500 hover:to-medical-400 shadow-md transition-all font-display hover:-translate-y-1">
+                                <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Formulate Assessment
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const filters = document.querySelectorAll('#patientFilters button');
+        const rows = document.querySelectorAll('.patient-row');
+
+        // Initial classes
+        const activeClass = "px-5 py-2.5 rounded-xl text-sm font-bold bg-slate-800 text-white shadow-md shadow-slate-800/20 transition-all border border-slate-700 hover:scale-105";
+        const inactiveClassTemplate = "px-5 py-2.5 rounded-xl text-sm font-bold bg-white text-slate-600 hover:bg-slate-50 shadow-sm transition-all border border-slate-200 hover:scale-105";
+
+        const getInactiveClass = (filterType) => {
+            if (filterType === 'critical') return `${inactiveClassTemplate} hover:text-red-600 hover:border-red-200`;
+            if (filterType === 'monitor') return `${inactiveClassTemplate} hover:text-amber-500 hover:border-amber-200`;
+            if (filterType === 'stable') return `${inactiveClassTemplate} hover:text-emerald-500 hover:border-emerald-200`;
+            return inactiveClassTemplate;
+        };
+
+        filters.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update button styles
+                filters.forEach(f => {
+                    f.className = getInactiveClass(f.dataset.filter);
+                });
+                
+                // Set active class but keep the icon colors if needed by stripping hover text colors
+                btn.className = activeClass;
+
+                const filterVal = btn.dataset.filter;
+                let visibleCount = 0;
+                
+                rows.forEach(row => {
+                    const risk = row.dataset.risk;
+                    let show = false;
+                    
+                    if (filterVal === 'all') {
+                        show = true;
+                    } else if (filterVal === 'critical' && risk == '2') {
+                        show = true;
+                    } else if (filterVal === 'monitor' && risk == '1') {
+                        show = true;
+                    } else if (filterVal === 'stable' && risk == '0') {
+                        show = true;
+                    }
+
+                    if (show) {
+                        row.style.display = '';
+                        // Reset animation delay so they fade in together nicely when filtered
+                        row.style.animationDelay = `${visibleCount * 50}ms`;
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}
