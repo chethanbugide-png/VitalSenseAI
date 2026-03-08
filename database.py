@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash
 
 # Use a persistent directory on Render if available, otherwise use local directory
 if os.environ.get('RENDER'):
-    DB_DIR = '/data'
+    DB_DIR = 'data'
 else:
     DB_DIR = '.'
     
