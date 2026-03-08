@@ -9,6 +9,8 @@
 [![Scikit-Learn](https://img.shields.io/badge/scikit--learn-%23F7931E.svg?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+## 🚀 Live Demo: [https://vitalsenseai-1.onrender.com](https://vitalsenseai-1.onrender.com)
+
 [Features](#features) • [Installation](#installation) • [Usage](#usage) • [Tech Stack](#tech-stack) • [Architecture](#architecture)
 </div>
 
