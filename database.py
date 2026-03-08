@@ -2,8 +2,15 @@ import sqlite3
 import os
 import json
 from werkzeug.security import generate_password_hash
-DB_PATH = 'vitalsense.db'
 
+# Use a persistent directory on Render if available, otherwise use local directory
+if os.environ.get('RENDER'):
+    DB_DIR = '/data'
+else:
+    DB_DIR = '.'
+    
+os.makedirs(DB_DIR, exist_ok=True)
+DB_PATH = os.path.join(DB_DIR, 'vitalsense.db')
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
