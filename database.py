@@ -202,6 +202,15 @@ def get_all_patients_with_latest_assessment():
 def get_user_by_username(username):
     conn = get_db_connection()
     user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
+    
+    # Just-in-time fallback for Render deployments where DB might be wiped
+    if not user and username in ['doctor1', 'nurse1']:
+        role = 'doctor' if username == 'doctor1' else 'nurse'
+        conn.execute('INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)',
+                     (username, generate_password_hash('password'), role))
+        conn.commit()
+        user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
+        
     conn.close()
     return dict(user) if user else None
 
