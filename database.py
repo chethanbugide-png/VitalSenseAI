@@ -1,7 +1,7 @@
 import sqlite3
 import os
 import json
-
+from werkzeug.security import generate_password_hash
 DB_PATH = 'vitalsense.db'
 
 def get_db_connection():
@@ -86,6 +86,14 @@ def init_db():
         )
     ''')
     
+    # Insert default users if none exist
+    cursor.execute('SELECT COUNT(*) as count FROM users')
+    if cursor.fetchone()['count'] == 0:
+        cursor.execute('INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)', 
+                       ('doctor1', generate_password_hash('password'), 'doctor'))
+        cursor.execute('INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)', 
+                       ('nurse1', generate_password_hash('password'), 'nurse'))
+                       
     conn.commit()
     conn.close()
 
